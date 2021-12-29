@@ -1,0 +1,4 @@
+worker/
+dist/
+infra/.terraform/
+infra/terraform.tfstate*

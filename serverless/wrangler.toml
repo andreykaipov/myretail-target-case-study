@@ -1,0 +1,17 @@
+# We only use Wrangler for local development, i.e. `wrangler dev`. Building and
+# bundling our module is via Deno, and publishing to prod is via Terraform.
+#
+# Similarly the package.json is only for Wrangler to work properly atm. See
+# https://github.com/cloudflare/wrangler/issues/1715.
+
+name = "myretail"
+type = "javascript"
+workers_dev = true
+compatibility_date = "2021-12-27"
+
+[vars]
+creds = "admin:admin"
+
+[[kv_namespaces]]
+binding = "myretail"
+preview_id = "550e42b8b8f2436b817858deebfa0d59"

@@ -1,0 +1,8 @@
+{
+  "name": "myretail",
+  "private": true,
+  "version": "0.1.0",
+  "author": "Andrey Kaipov <andreykaipov@users.noreply.github.com>",
+  "description": "CF Worker solution for Target case study thing",
+  "main": "dist/worker.js"
+}
