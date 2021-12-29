@@ -1,0 +1,34 @@
+---
+services:
+  myretail-api:
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      - MYRETAIL_BIND=:3000
+      - MYRETAIL_CREDS=admin:admin
+      - REDIS_URI=redis://redis:6379
+      - MONGO_URI=mongodb://mongo:27017
+      - REDSKY_ENV=prod
+    networks:
+      - cache
+      - database
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - cache
+  mongo:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data/mongo:/data/db
+    networks:
+      - database
+networks:
+  cache:
+  database:
