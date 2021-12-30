@@ -9,7 +9,7 @@ is to create a products API, that piggy-backs off of Target's own API.
 The first solution is your traditional 12-factor microservice -- written in Go,
 using MongoDB as the NoSQL store to fulfill the prompt's requirements, and Redis
 for anything we might want to cache. You can run it all locally using the
-included [`docker-compose.yml`](./docker-compose.yml) file, or deploy just the
+included [`docker-compose.yml`](./traditional/docker-compose.yml) file, or deploy just the
 app onto your favorite container orchestrator platform, configuring it via the
 environment to point to your remote MongoDB and Redis services. All it's missing
 is a message queue before it turns into over-engineered hot garbage. 👻
@@ -111,7 +111,7 @@ BLT. It's your chicken noodle soup.
 The second solution is a JavaScript service worker deployed onto Cloudflare's
 serverless platform -- Cloudflare Workers. Demoing this is even nicer because
 it's already running at https://myretail.kaipov.com! For deploying it onto your
-own Cloudflare Worker though, see [`SETUP.md`](./serverless/traditional).
+own Cloudflare Worker though, see [`SETUP.md`](./serverless/SETUP.md).
 
 Let's prepopulate _myRetail_ with some test product data. We can do this by
 hitting RedSky's `/redsky_aggregations/v1/web/plp_search_v1` endpoint. This was
