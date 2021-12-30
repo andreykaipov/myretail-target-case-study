@@ -196,4 +196,107 @@ redsky-cached: HIT
 redsky-cached: HIT
 ```
 
-Cool.
+Cool. Finally, I suppose we can do some quick load testing. For this I'm using
+[hey](https://github.com/rakyll/hey), similar to Apache Bench (`ab`). Let's pick
+a random ID and check how quick retrieval is. The following makes 20000 requests
+against our API, keeping 100 concurrent requests open at any time.
+
+```console
+❯ hey -n 20000 -c 100 https://myretail.kaipov.com/products/79661778
+
+Summary:
+  Total:        21.6468 secs
+  Slowest:      4.7106 secs
+  Fastest:      0.0331 secs
+  Average:      0.0802 secs
+  Requests/sec: 923.9245
+
+
+Response time histogram:
+  0.033 [1]     |
+  0.501 [19755] |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+  0.969 [57]    |
+  1.436 [65]    |
+  1.904 [47]    |
+  2.372 [23]    |
+  2.840 [6]     |
+  3.307 [15]    |
+  3.775 [21]    |
+  4.243 [1]     |
+  4.711 [9]     |
+
+
+Latency distribution:
+  10% in 0.0452 secs
+  25% in 0.0493 secs
+  50% in 0.0553 secs
+  75% in 0.0640 secs
+  90% in 0.0760 secs
+  95% in 0.0883 secs
+  99% in 0.8466 secs
+
+Details (average, fastest, slowest):
+  DNS+dialup:   0.0039 secs, 0.0331 secs, 4.7106 secs
+  DNS-lookup:   0.0029 secs, 0.0000 secs, 0.9001 secs
+  req write:    0.0000 secs, 0.0000 secs, 0.0006 secs
+  resp wait:    0.0741 secs, 0.0329 secs, 4.7106 secs
+  resp read:    0.0004 secs, 0.0000 secs, 2.3472 secs
+
+Status code distribution:
+  [200] 20000 responses
+```
+
+Now at first glance... while ~500ms response times might not be amazing, we did
+just handle a giant spike in traffic. We're also on Cloudflare's free plan, so
+if anything it's a testament to how awesome CDNs are. We should also keep in
+mind load testing is relative and we've no baseline for actual production
+traffic, so honestly these numbers mean nothing right now!
+
+However, it's interesting to note a smaller concurrency count gives more
+impressive results, which makes sense considering fewer connections have to go
+through the initial connection and SSL handshake slog.
+
+```console
+❯ hey -n 1000 -c 5 https://myretail.kaipov.com/products/79661778
+
+Summary:
+  Total:        12.1202 secs
+  Slowest:      0.3383 secs
+  Fastest:      0.0389 secs
+  Average:      0.0594 secs
+  Requests/sec: 82.5066
+
+
+Response time histogram:
+  0.039 [1]     |
+  0.069 [850]   |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+  0.099 [133]   |■■■■■■
+  0.129 [11]    |■
+  0.159 [0]     |
+  0.189 [0]     |
+  0.219 [0]     |
+  0.249 [0]     |
+  0.278 [0]     |
+  0.308 [3]     |
+  0.338 [2]     |
+
+
+Latency distribution:
+  10% in 0.0465 secs
+  25% in 0.0502 secs
+  50% in 0.0555 secs
+  75% in 0.0625 secs
+  90% in 0.0738 secs
+  95% in 0.0841 secs
+  99% in 0.1067 secs
+
+Details (average, fastest, slowest):
+  DNS+dialup:   0.0005 secs, 0.0389 secs, 0.3383 secs
+  DNS-lookup:   0.0002 secs, 0.0000 secs, 0.0422 secs
+  req write:    0.0000 secs, 0.0000 secs, 0.0002 secs
+  resp wait:    0.0587 secs, 0.0389 secs, 0.2244 secs
+  resp read:    0.0001 secs, 0.0000 secs, 0.0062 secs
+
+Status code distribution:
+  [200] 1000 responses
+```
